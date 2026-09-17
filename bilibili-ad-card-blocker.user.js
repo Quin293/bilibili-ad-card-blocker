@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Bilibili 广告卡片屏蔽
 // @namespace    https://github.com/Quin293/bilibili-ad-card-blocker
-// @version      1.2.0
-// @description  屏蔽 Bilibili 首页推荐流广告和视频播放页右侧广告，支持动态加载。
+// @version      1.2.1
+// @description  屏蔽 Bilibili 首页推荐广告、视频页右侧广告和条状广告，支持动态加载。
 // @author       Quin293
 // @match        https://www.bilibili.com/*
 // @grant        none
@@ -17,8 +17,9 @@
 
     const HOME_CARD = '.bili-video-card.is-rcmd:not(.enable-no-interest)';
     const VIDEO_AD = '.video-card-ad-small';
+    const STRIP_AD = '.strip-ad-inner';
     const AD_LINK = 'a[href*="cm.bilibili.com"]';
-    const CARD = `${HOME_CARD}, ${VIDEO_AD}`;
+    const CARD = `${HOME_CARD}, ${VIDEO_AD}, ${STRIP_AD}`;
     const CANDIDATE = `${CARD}, ${AD_LINK}`;
 
     function isAdLink(link) {
@@ -40,6 +41,12 @@
             return;
         }
 
+        // 视频页条状广告：优先删除外层容器，避免残留占位高度。
+        if (element.matches(STRIP_AD)) {
+            (element.closest('.strip-ad') || element).remove();
+            return;
+        }
+
         // 首页卡片需要包含广告链接或明确的“广告”标记。
         if (element.matches(HOME_CARD)) {
             const hasAdLink = [...element.querySelectorAll(AD_LINK)].some(isAdLink);
@@ -54,7 +61,10 @@
 
         // 保留原脚本的兜底规则，只移除广告链接所在的卡片。
         if (element.matches(AD_LINK) && isAdLink(element)) {
-            const card = element.closest(VIDEO_AD) || element.closest('.bili-feed-card');
+            const card = element.closest(VIDEO_AD) ||
+                element.closest('.strip-ad') ||
+                element.closest(STRIP_AD) ||
+                element.closest('.bili-feed-card');
             if (card) card.remove();
         }
     }

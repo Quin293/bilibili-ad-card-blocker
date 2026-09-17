@@ -10,6 +10,7 @@ const html = `<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 <div class="bili-feed-card" id="initial-ad"><div class="bili-video-card is-rcmd"><span class="bili-video-card__stats--text">广告</span></div></div>
 <div class="bili-feed-card" id="initial-normal"><div class="bili-video-card is-rcmd"><a href="https://www.bilibili.com/video/BVexample">普通视频</a></div></div>
 <div class="video-card-ad-small" id="initial-sidebar">侧栏广告</div>
+<div class="strip-ad" id="initial-strip"><div class="strip-ad-inner">条状广告</div></div>
 </section>
 <script src="/bilibili-ad-card-blocker.user.js"></script>
 <script>
@@ -26,6 +27,7 @@ const html = `<!doctype html><html lang="zh-CN"><meta charset="utf-8">
     check('初始首页广告被移除', !exists('initial-ad'));
     check('初始普通视频保留', exists('initial-normal'));
     check('初始侧栏广告被移除', !exists('initial-sidebar'));
+    check('初始条状广告连同外层容器被移除', !exists('initial-strip'));
     await insert('<div class="video-card-ad-small" id="root-ad">动态侧栏广告</div>');
     check('新增节点本身是广告时被移除', !exists('root-ad'));
     await insert('<div class="bili-feed-card" id="link-ad"><a href="https://cm.bilibili.com/example">广告链接</a></div>');
@@ -60,6 +62,16 @@ const html = `<!doctype html><html lang="zh-CN"><meta charset="utf-8">
     check('标题包含广告的普通视频保留', exists('ad-title'));
     await insert('<div class="bili-feed-card" id="relative-ad"><a href="//cm.bilibili.com/example">协议相对链接</a></div>');
     check('协议相对广告链接被移除', !exists('relative-ad'));
+    await insert('<div class="strip-ad" id="dynamic-strip"><div class="strip-ad-inner">动态条状广告</div></div>');
+    check('动态条状广告连同外层容器被移除', !exists('dynamic-strip'));
+    await insert('<div class="strip-ad-inner" id="standalone-strip">独立条状广告</div>');
+    check('无外层容器的条状广告被移除', !exists('standalone-strip'));
+    await insert('<div class="strip-ad" id="late-strip"></div>');
+    document.querySelector('#late-strip').insertAdjacentHTML('beforeend', '<div class="strip-ad-inner">后补条状广告</div>');
+    await settle();
+    check('已有容器后补条状广告时删除整个容器', !exists('late-strip'));
+    await insert('<div class="strip-ad" id="link-strip"><a href="https://cm.bilibili.com/example">条状广告链接</a></div>');
+    check('条状广告链接兜底删除外层容器', !exists('link-strip'));
     const passed = results.filter(result => result.ok).length;
     document.querySelector('#results').textContent = passed + '/' + results.length + ' 通过\\n' + results.map(result => (result.ok ? 'PASS ' : 'FAIL ') + result.name).join('\\n');
     document.title = passed === results.length ? '全部验证通过' : '验证失败';

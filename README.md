@@ -1,6 +1,6 @@
 # Bilibili 广告卡片屏蔽
 
-适用于 Tampermonkey（篡改猴）的用户脚本，移除 Bilibili 首页推荐流广告卡片和视频播放页右侧广告卡片，支持动态加载。
+适用于 Tampermonkey（篡改猴）的用户脚本，移除 Bilibili 首页推荐流广告卡片、视频播放页右侧广告卡片和条状广告，支持动态加载。
 
 ## 安装
 
@@ -14,7 +14,8 @@
 
 - 首页：检查 `.bili-video-card.is-rcmd:not(.enable-no-interest)`，发现 `cm.bilibili.com` 广告链接或“广告”标记时，删除所属推荐卡片。
 - 视频播放页：删除 `.video-card-ad-small`。
-- 兜底：删除 `cm.bilibili.com` 链接所属的 `.bili-feed-card` 或 `.video-card-ad-small`。
+- 条状广告：检测 `.strip-ad-inner`，优先删除外层 `.strip-ad`，避免残留占位高度。
+- 兜底：删除 `cm.bilibili.com` 链接所属的 `.video-card-ad-small`、`.strip-ad`、`.strip-ad-inner` 或 `.bili-feed-card`。
 - 监听新增节点、链接和样式类变化、广告文字更新；同时检查新增节点本身，避免漏检。
 
 此脚本仅移除符合上述规则的页面元素，不处理视频内容中的口播、贴片或所有类型的商业推广。Bilibili 页面结构调整后，规则可能需要更新。
@@ -22,6 +23,11 @@
 ## 隐私
 
 脚本不发送网络请求、不收集数据、不读写浏览器存储、不加载远程依赖；使用 `@grant none`，仅在 `https://www.bilibili.com/*` 的顶层页面运行。
+
+## 1.2.1 更新
+
+- 合入新版脚本的条状广告屏蔽规则与广告链接兜底规则。
+- 保留动态节点、后补广告内容和链接域名校验修复。
 
 ## 1.2.0 更新
 
@@ -36,7 +42,7 @@
 
 ## 本地验证
 
-运行 `node --check bilibili-ad-card-blocker.user.js` 检查语法。运行 `node verify.cjs`，再打开 `http://127.0.0.1:18763`，可在浏览器中执行 16 项模拟 DOM 验证，涵盖广告移除、动态更新和普通卡片保留。
+运行 `node --check bilibili-ad-card-blocker.user.js` 检查语法。运行 `node verify.cjs`，再打开 `http://127.0.0.1:18763`，可在浏览器中执行 21 项模拟 DOM 验证，涵盖广告移除、条状广告容器移除、动态更新和普通卡片保留。
 
 这些验证不等同于当前 Bilibili 真实页面实测。
 
