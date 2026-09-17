@@ -4,6 +4,10 @@
 
 ## 安装
 
+推荐通过 [Greasy Fork 脚本页面](https://greasyfork.org/zh-CN/scripts/596146) 点击“安装此脚本”。
+
+也可以从 GitHub 安装：
+
 1. 在浏览器中安装 [Tampermonkey](https://www.tampermonkey.net/)。
 2. 点击 [安装脚本](https://raw.githubusercontent.com/Quin293/bilibili-ad-card-blocker/main/bilibili-ad-card-blocker.user.js)。
 3. 在脚本管理器弹出的页面中确认安装，然后刷新 Bilibili 页面。
